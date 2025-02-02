@@ -7,13 +7,12 @@
 //
 
 import UIKit
+import CoreData
 
 class TodoViewController: UITableViewController {
     var todos:[TodoItem]=[TodoItem]()
     
-    var defaults:UserDefaults=UserDefaults.standard
-    var dataFilePath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!.appendingPathComponent("todos.plist")
-    
+    let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
@@ -35,14 +34,14 @@ class TodoViewController: UITableViewController {
        // Configure the cell’s contents.
         cell.textLabel!.text = todos[indexPath.row].title
         
-        cell.accessoryType = todos[indexPath.row].isCompleted ? .checkmark : .none
+        cell.accessoryType = todos[indexPath.row].done ? .checkmark : .none
         
     
         
        return cell
     }
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        todos [indexPath.row].isCompleted = !todos[indexPath.row].isCompleted
+        todos [indexPath.row].done = !todos[indexPath.row].done
         tableView.reloadRows(at: [indexPath], with: .none)
         saveItems()
     }
@@ -55,9 +54,13 @@ class TodoViewController: UITableViewController {
         
         let addAction = UIAlertAction(title: "Add", style: .default) { (action) in
              if let text = uiTextField.text {
-                 self.todos.append(TodoItem(title: text))
-                 self.tableView.reloadData()
+                 let item = TodoItem(context: self.context)
+                 item.title = text
+                 item.done = false
                  self.saveItems()
+                 self.loadItems()
+                 self.tableView.reloadData()
+
              }
          }
         
@@ -73,20 +76,16 @@ class TodoViewController: UITableViewController {
     
     func loadItems(){
         do{
-            if let data = try? Data(contentsOf: dataFilePath) {
-                let decoder = PropertyListDecoder()
-                todos = try decoder.decode([TodoItem].self, from: data)
-            }
-           }catch{
+            let request: NSFetchRequest<TodoItem>=TodoItem.fetchRequest()
+            todos = try context.fetch(request)
+        }catch{
             print("error \(error)")
          }
     }
     
     func saveItems(){
-        let encoder = PropertyListEncoder()
         do{
-           let data = try encoder.encode(self.todos)
-           try data.write(to: self.dataFilePath)
+          try context.save()
         }
         catch{
             print("error \(error)")

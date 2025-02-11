@@ -8,11 +8,15 @@
 
 import UIKit
 import RealmSwift
+import ChameleonFramework
 
 class TodoViewController: SwipeTableViewController {
 
     let realm = try! Realm()
-
+    var catColor:UIColor?
+    
+    @IBOutlet weak var searcchBar: UISearchBar!
+    
     var category: CategoryItem?{
         didSet{
             loadItems()
@@ -24,6 +28,19 @@ class TodoViewController: SwipeTableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
+    }
+    override func viewWillAppear(_ animated: Bool) {
+        catColor = UIColor(hexString: category?.color)
+        let catContrastColor = UIColor(contrastingBlackOrWhiteColorOn:catColor, isFlat:true)
+        if let navBar = navigationController?.navigationBar{
+            navBar.backgroundColor = catColor
+            navBar.tintColor = catContrastColor
+            navBar.titleTextAttributes = [NSAttributedString.Key.foregroundColor: catContrastColor ?? .white]
+        }
+        
+        title = category?.title
+
+        searcchBar.barTintColor = catColor
     }
     
     
@@ -41,9 +58,13 @@ class TodoViewController: SwipeTableViewController {
        // Fetch a cell of the appropriate type.
         let cell = super.tableView(tableView, cellForRowAt: indexPath)
         cell.textLabel!.text = todos?[indexPath.row].title ?? "No items available yet"
-        
+       if let color = catColor?.darken(byPercentage: CGFloat(indexPath.row)/CGFloat(todos?.count ?? 1)){
+           cell.backgroundColor = color
+           cell.textLabel?.textColor = UIColor(contrastingBlackOrWhiteColorOn:color, isFlat:true)
+        }
         cell.accessoryType = todos?[indexPath.row].done ?? false ? .checkmark : .none
-       return cell
+     
+        return cell
     }
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {

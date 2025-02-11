@@ -12,6 +12,8 @@ import SwipeCellKit
 class SwipeTableViewController: UITableViewController ,SwipeTableViewCellDelegate{
 
     override func viewDidLoad() {
+        tableView.separatorStyle = .none
+        
         super.viewDidLoad()
 
     }
@@ -24,7 +26,6 @@ class SwipeTableViewController: UITableViewController ,SwipeTableViewCellDelegat
        // Fetch a cell of the appropriate type.
        let cell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath) as! SwipeTableViewCell
         cell.delegate = self
-       
        return cell
     }
 

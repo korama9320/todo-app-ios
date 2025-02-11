@@ -1,20 +1,18 @@
 //
-//  File.swift
+//  TodoItem.swift
 //  Todoey
 //
-//  Created by Abdelrahman Youssef on 27/01/2025.
+//  Created by Roboost Mobile on 10/02/2025.
 //  Copyright © 2025 App Brewery. All rights reserved.
 //
 
 import Foundation
+import RealmSwift
 
-class TodoItem : Codable {
+class TodoItem: Object {
+    @objc dynamic var title: String = ""
+    @objc dynamic var done: Bool = false
+    @objc dynamic var createdDate: Date = Date()
+    var parentCategory = LinkingObjects(fromType: CategoryItem.self, property: "items")
     
-    var title: String
-    var isCompleted: Bool
-    
-    init (isCompleted: Bool = false, title: String) {
-        self.title = title
-        self.isCompleted = isCompleted
-    }
 }

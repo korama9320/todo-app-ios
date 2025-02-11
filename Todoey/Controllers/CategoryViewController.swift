@@ -9,7 +9,7 @@
 import UIKit
 import RealmSwift
 
-class CategoryViewController: UITableViewController {
+class CategoryViewController: SwipeTableViewController {
     let realm = try! Realm()
     var categories:Results<CategoryItem>!
     var selectedCategory: CategoryItem?
@@ -29,7 +29,7 @@ class CategoryViewController: UITableViewController {
     // Provide a cell object for each row.
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
        // Fetch a cell of the appropriate type.
-       let cell = tableView.dequeueReusableCell(withIdentifier: "categoryListCell", for: indexPath)
+        let cell = super.tableView(tableView, cellForRowAt: indexPath)
        
        // Configure the cell’s contents.
         cell.textLabel!.text = categories?[indexPath.row].title ?? "No categories available yet"
@@ -92,6 +92,16 @@ class CategoryViewController: UITableViewController {
             }
         }
         catch{
+            print("error \(error)")
+        }
+    }
+    
+    override func updateCell(_ indexPath: IndexPath) {
+        do{
+            try self.realm.write{
+                self.realm.delete(self.categories[indexPath.row])
+            }
+        }catch{
             print("error \(error)")
         }
     }

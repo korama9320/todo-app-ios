@@ -4,6 +4,7 @@ target 'Todoey' do
   # Comment the next line if you don't want to use dynamic frameworks
   use_frameworks!
   pod 'RealmSwift', '~> 10.36.0'
+  pod 'SwipeCellKit', '~> 2.7'
   # Pods for Todoey
  
 
